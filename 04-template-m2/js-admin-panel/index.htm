@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        
+        <title>Admin Panel Layout</title>
+        
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"><!-- , user-scalable=no -->
+
+        <!-- LIBRARY FILES -->
+        <!-- <link rel="preload" href="image.png" as="image"> -->
+        <link rel="preload" href="../../basic/font/open-sans/OpenSans-Regular.ttf" as="font" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="../../basic/basic.min.css">
+        <link rel="stylesheet" type="text/css" href="common/ui-standards.css">
+        <script src="../../basic/basic.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../basic/scroll-bar.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="common/ui-standards.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../comp-m2/ui-effects.js" type="text/javascript" charset="utf-8"></script>
+        
+        <script src="../../comp-m2/tooltip.min.js" charset="utf-8" defer></script>
+        <script src="../../comp-m2/input-b.min.js" charset="utf-8" defer></script>
+        <script src="../../comp-m2/email-input-b.min.js" charset="utf-8" defer></script>
+        <script src="../../comp-m2/password-input-b.min.js" charset="utf-8" defer></script>
+        <script src="../../comp-m2/left-menu.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../comp-m2/badget-v2.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../comp-m2/search-input-v2.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../comp-m2/tiny-select.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../comp-m2/waiting.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../comp-m2/text-tabs.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../comp-m1/ui-web-view.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../comp-m2/toggle.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../comp-m2/dialog.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="common/top-bar.js" type="text/javascript" charset="utf-8"></script>
+        <script src="common/main-view.js" type="text/javascript" charset="utf-8"></script>
+        <script src="common/right-view.js" type="text/javascript" charset="utf-8"></script>
+        <script src="common/full-view.js" type="text/javascript" charset="utf-8"></script>
+        
+        <script src="common/start-page.js" type="text/javascript" charset="utf-8"></script>
+        <script src="common/module-page.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../comp-m2/login-page.js" type="text/javascript" charset="utf-8"></script>
+        <script src="pages/home.js" type="text/javascript" charset="utf-8"></script>
+        <script src="pages/contents.js" type="text/javascript" charset="utf-8"></script>
+        <script src="pages/notifications.js" type="text/javascript" charset="utf-8"></script>
+        <script src="pages/reports.js" type="text/javascript" charset="utf-8"></script>
+        <script src="pages/settings.js" type="text/javascript" charset="utf-8"></script>
+        <script src="pages/users.js" type="text/javascript" charset="utf-8"></script>
+        <script src="pages/user-actions.js" type="text/javascript" charset="utf-8"></script>
+        
+        <!-- ALL COMPONENTS IN ONE FILE -->
+        <!-- <script src="components.js" type="text/javascript" charset="utf-8"></script> -->
+         
+        <!--
+
+        /* Bismillah */
+        
+        - Eğer left menu, mainView dışında açılır ise button seçilmesin.
+        
+        -->
+        
+        <script type="module">
+
+        // Supabase constants
+        const SUPABASE_PROJECT_URL = "https://xhzzgxhjyoqcsftamtyz.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoenpneGhqeW9xY3NmdGFtdHl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUzMTg2MDAsImV4cCI6MjA2MDg5NDYwMH0.XptujcYMNgl9XIzIQ2_CUig9JzkYOCKONfYAmMPd_wc";
+
+        // First running function.
+        window.onload = async function() {
+
+            page.color = "black";
+
+            const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+            window.supabase = createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
+
+            window.userData = await checkIfLoggedIn();
+
+            if (!userData) {
+
+                // Show Login Page
+                LoginPage({
+                    supabase: supabase,
+                    panelWidth: 420,
+                    primaryColor: "#2C5A38",
+                    panelName: "MY PANEL v25.08.11",
+                    onSuccess: function() {
+                        // If loggedIn then
+                        window.location.reload();
+                    },
+                });
+
+                // TEST DATA: Fill the user data
+                that.loginEmail.setInputValue("bugra.ozden@gmail.com");
+                that.loginPassword.setInputValue("123456");
+                // Call manuel to check form with out edit
+                that.loginEmail.onEdit();
+
+            } else {
+
+                // Show Panel Home Page
+                createStructure();
+
+            }
+
+        };
+
+        window.createStructure = function() {
+
+            if (!userData) { logout(); return 0; }
+
+            // Main Content
+            window.mainView = MainView();
+
+            // Top Bar
+            window.topBar = TopBar({
+                panelIcon: "assets/panel-icon.png",
+                panelName: "MY PANEL",
+                backgroundColor: "#2C5A38", // "#344f6c", "#583432", "#2C5A38"
+                tab_border: 1, // 1, 0
+            });
+
+            // Right Content
+            window.rightView = RightView();
+
+            // Menu items
+            const menuItems = [
+                { key: HomePage.KEY, type: "button", text: "Home", icon: "assets/left-menu/home.png" },
+                { key: ReportsPage.KEY, type: "button", text: "Reports", icon: "assets/left-menu/reports.png" },
+                { key: "divider1", type: "header", text: "CONTENTS" },
+                { key: UsersPage.KEY, type: "button", text: "Users", icon: "assets/left-menu/data-table.png" },
+                { key: ContentsPage.KEY, type: "button", text: "Contents", icon: "assets/left-menu/data-table.png" },
+                { key: "divider1", type: "header", text: "MODULES" },
+                { key: "module1", type: "button", text: "Module 1 (Main)", icon: "assets/left-menu/brick.png" },
+                { key: "module2", type: "button", text: "Module 2 (Full)", icon: "assets/left-menu/brick.png", dontSelect: 1 },
+                { key: "module3", type: "button", text: "Module 3 (Right)", icon: "assets/left-menu/brick.png", dontSelect: 1 },
+                { key: "divider1", type: "header", text: "URL MODULES" },
+                { key: "url1", type: "button", text: "HandBook", icon: "assets/left-menu/bolt.png", dontSelect: 1 },
+                { key: "url2", type: "button", text: "Personal Expense", icon: "assets/left-menu/code.png", dontSelect: 1 },
+                { key: "url3", type: "button", text: "ToDo List", icon: "assets/left-menu/code.png", dontSelect: 1 },
+            ];
+
+            // Left Menu
+            window.leftMenu = LeftMenu({
+                items: menuItems,
+                onItemClick: function(item) {
+                    //println("Clicked Key: " + item.key);
+                    openPageByKey(item.key);
+                }
+            });
+
+            // Add item to bottom
+            leftMenu.addItemToBottom({ key: SettingsPage.KEY, type: "button", text: "Settings", icon: "assets/left-menu/setting.png" });
+
+            
+            // Add random items to top
+            /*
+            for(var i = 0; i < 30; i++) {
+                leftMenu.addItemToTop({ key: "aaa" + i, type: "button", text: "Settings" + i, icon: "assets/data-table.png" });
+            }
+            */
+
+            // Full Content
+            window.fullView = FullView();
+
+            // Waiting
+            window.waiting = Waiting({
+                animated: 1, 
+                coverBackgroundColor: "rgba(0,0,0,0.6)",
+                waitingIcon: "../../comp-m2/waiting/clock3.png", 
+            });
+            waiting.icon.elem.style.filter = "invert(100%)";
+
+            // Select home
+            leftMenu.setSelectedItem(HomePage.KEY);
+            // Open home page
+            openPageByKey(HomePage.KEY);
+
+        };
+
+        window.openPageByKey = function(key) {
+
+            if (!userData) { logout(); return 0; }
+
+            // Eğer sayfa zaten açıkken çağırılır ise, sadece sayfayı kapatır ve 0 döner.
+            const shouldOpenRightView = () => {
+
+                if (rightView.isShown(key)) {
+                    rightView.hide();
+                    rightView.clean();
+                    return 0;
+
+                } else {
+                    return 1;
+                    // Sayfa kapalı ve açmak için uygun.
+                }
+
+            };
+
+            switch (key) {
+
+                case "logout":
+                    logout();
+                    break;
+
+                case HomePage.KEY:
+                    HomePage();
+                    break;
+
+                case ContentsPage.KEY:
+                    ContentsPage();
+                    break;
+
+                case NotificationsPage.KEY:
+                    if(shouldOpenRightView()) { // If 0 then just close the page
+                        NotificationsPage();
+                    }
+                    break;
+
+                case ReportsPage.KEY:
+                    ReportsPage();
+                    break;
+
+                case SettingsPage.KEY:
+                    SettingsPage();
+                    break;
+
+                case UsersPage.KEY:
+                    UsersPage();
+                    break;
+
+                case UserActionsPage.KEY:
+                    if(shouldOpenRightView()) { // If 0 then just close the page
+                        UserActionsPage();
+                    }
+                    break;
+
+                case "module1":
+                    ModulePage({
+                        pageKey: key,
+                        moduleURL: "module1/index.htm",
+                        container: mainView,
+                    });
+                    break;
+
+                case "module2":
+                    ModulePage({
+                        pageKey: key,
+                        moduleURL: "module2/index.htm",
+                        container: fullView,
+                    });
+                    //fullView.color = "white";
+                    break;
+
+                case "module3":
+                    if(shouldOpenRightView()) { // If 0 then just close the page
+                        ModulePage({
+                            pageKey: key,
+                            moduleURL: "module3/index.htm",
+                            container: rightView,
+                        });
+                        rightView.setWidth(800);
+                    }
+                    break;
+
+                case "module4":
+                    if (!mainView.isShown(key)) { // If already opened dont open again.
+                        ModulePage({
+                            pageKey: key,
+                            moduleURL: "module4/index.htm",
+                            container: mainView,
+                        });
+
+                        leftMenu.clearSelection(); // mainView da açılacağı için, left menu deki seçimi temizle.
+                    }
+                    break;
+
+                case "module5":
+                    if(shouldOpenRightView()) { // If 0 then just close the page
+                        ModulePage({
+                            pageKey: key,
+                            moduleURL: "module5/index.htm",
+                            container: rightView,
+                        });
+                        rightView.setWidth(600);
+                    }
+                    break;
+                
+                case "url1":
+                    ModulePage({
+                        pageKey: key,
+                        moduleURL: "https://bug7a.github.io/basic.js-handbook/",
+                        container: mainView,
+                    });
+                    break;
+
+                case "url2":
+                    if(shouldOpenRightView()) { // If 0 then just close the page
+                        ModulePage({
+                            pageKey: key,
+                            moduleURL: "https://bug7a.github.io/expense/",
+                            container: rightView,
+                        });
+                        rightView.setWidth(450);
+                    }
+                    break;
+
+                case "url3":
+                    if(shouldOpenRightView()) { // If 0 then just close the page
+                        ModulePage({
+                            pageKey: key,
+                            moduleURL: "https://bug7a.github.io/javascript-single-page-application-example/sample1.htm",
+                            container: rightView,
+                        });
+                        rightView.setWidth(450);
+                        rightView.page.elem.style.filter = "invert(100%)";
+                        rightView.page.elem.style.borderLeft = "1px solid rgba(0,0,0,0.15)";
+                    }
+                    break;
+
+            }
+
+        };
+
+        window.checkIfLoggedIn = async function() {
+
+            // TEST:
+            return true;
+
+            const { data, error } = await supabase.auth.getSession();
+            return data.session !== null;
+
+        };
+
+        window.logout = async function() {
+
+            await supabase.auth.signOut();
+            window.location.reload();
+
+        };
+
+        </script>
+
+    </head>
+    <body>
+        
+        <!-- HTML content -->
+        
+    </body>
+</html>
